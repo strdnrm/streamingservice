@@ -1,0 +1,51 @@
+version: "3.8"
+services:
+  database:
+    container_name: postgres
+    image: postgres:15-alpine
+    restart: always
+    hostname: ${POSTGRES_HOST}
+    env_file:
+      - ./config/.env
+    environment:
+      - POSTGRES_USER=${DBUSER}
+      - POSTGRES_PASSWORD=${DBPASSWORD}     
+      - POSTGRES_DB=${DBNAME}
+      - DATABASE_HOST=${DBHOST}
+      - DATABASE_PORT=${DBPORT}
+    volumes:
+      - data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  nats-streaming:
+    image: library/nats-streaming:latest
+    restart: always
+    container_name: nats-streaming
+    ports:
+      - 4222:4222
+      - 8222:8222
+    volumes:
+      - ./nats-streaming:/data
+
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      ./config/.env
+    depends_on:
+      database:
+        condition: service_healthy
+      nats-streaming:
+        condition: service_started
+    networks:
+      - default
+    ports:
+      - 8080:8080
+
+volumes:
+  data:
