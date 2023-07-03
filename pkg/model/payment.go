@@ -11,5 +11,5 @@ type Payment struct {
 	Bank         string `db:"bank" json:"bank" validate:"required"`
 	DeliveryCost int    `db:"delivery_cost" json:"delivery_cost" validate:"gt=0"`
 	GoodsTotal   int    `db:"goods_total" json:"goods_total" validate:"gt=0"`
-	CustomFee    int    `db:"custom_fee" json:"custom_fee" validate:"gt=0"`
+	CustomFee    int    `db:"custom_fee" json:"custom_fee"`
 }
