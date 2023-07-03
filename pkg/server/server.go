@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"fmt"
 	"streamingservice/pkg/config"
 	"streamingservice/pkg/routes"
@@ -45,9 +46,12 @@ func (s *Server) Start() error {
 		return err
 	}
 
-	s.GetMessages("test", "test", "test-1")
+	_, err := s.Store.Order().GetAll(context.Background())
+	if err != nil {
+		return err
+	}
 
-	// fmt.Printf("Starting server at port %s\n", s.config.Port)
+	s.GetMessages("test", "test", "test-1")
 
 	return s.Router.Run(s.config.Port)
 }
